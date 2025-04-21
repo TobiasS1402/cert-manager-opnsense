@@ -1,0 +1,10 @@
+services:
+  crt:
+    build: .
+    environment:
+      - OPNSENSE_HOST=
+      - API_KEY=
+      - API_SECRET=
+      - CERT_UUID=
+      - CA_UUID=
+      - SECRET_NAME=

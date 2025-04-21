@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: certificate-manager-opnsense
+  namespace: networking
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: my-custom-container
+            image: tobiass1402:certificate-manager-opnsense
+            imagePullPolicy: Always
+            env:
+              - name: OPNSENSE_HOST
+                value:
+              - name: API_KEY
+                value:
+              - name: API_SECRET
+                value:
+              - name: CERT_UUID
+                value:
+              - name: CA_UUID
+                value:
+              - name: SECRET_NAME
+                value: customcert
+          restartPolicy: OnFailure
