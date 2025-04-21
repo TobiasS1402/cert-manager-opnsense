@@ -1,8 +1,8 @@
 #!/bin/bash
 
-token_path = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-ca_cert_path = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-namespace_path = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+token_path="/var/run/secrets/kubernetes.io/serviceaccount/token"
+ca_cert_path="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+namespace_path="/var/run/secrets/kubernetes.io/serviceaccount/namespace"
 
 BACKUPDIR="/tmp"
 
@@ -36,7 +36,7 @@ EOF
 )
 
 # unsure if this will work
-curl -X POST "https://kubernetes.default.svc/api/v1/namespaces/$namespace_path/secrets" \
+curl --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$namespace_path/secrets" \
     -H "Authorization: Bearer $KUBE_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$SECRET_JSON" \
