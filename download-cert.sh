@@ -24,7 +24,7 @@ SECRET_JSON=$(cat <<EOF
   "kind": "Secret",
   "metadata": {
     "name": "${SECRET_NAME}",
-    "namespace": "${NAMESPACE:-default}"
+    "namespace": "${KUBE_NAMESPACE}"
   },
   "type": "kubernetes.io/tls",
   "data": {
