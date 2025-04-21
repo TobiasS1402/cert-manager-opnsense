@@ -12,9 +12,9 @@ KUBE_TOKEN=`cat $token_path`
 KUBE_NAMESPACE=`cat $namespace_path`
 
 
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt' >> "$BACKUPDIR/crt.pem"
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv' >> "$BACKUPDIR/key.pem"
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt' >>  "$BACKUPDIR/cacert.pem" 
+curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt_payload' >> "$BACKUPDIR/crt.pem"
+curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv_payload' >> "$BACKUPDIR/key.pem"
+curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt_payload' >>  "$BACKUPDIR/cacert.pem" 
 
 cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/cert.pem"
 
@@ -32,8 +32,8 @@ SECRET_JSON=$(cat <<EOF
   },
   "type": "kubernetes.io/tls",
   "data": {
-    "tls.crt": "$(cat "$BACKUPDIR/cert.pem | base64 -d")",
-    "tls.key": "$(cat "$BACKUPDIR/key.pem | base64 -d")"
+    "tls.crt": "$(cat "$$BACKUPDIR/crt.pem" | base64 | tr -d '\n')",
+    "tls.key": "$(cat "$BACKUPDIR/key.pem" | base64 | tr -d '\n')"
   }
 }
 EOF
