@@ -16,7 +16,7 @@ curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output
 curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv_payload' >> "$BACKUPDIR/key.pem"
 curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt_payload' >>  "$BACKUPDIR/cacert.pem" 
 
-cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/cert.pem"
+cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/crt.pem"
 
 SECRET_JSON=$(cat <<EOF
 {
