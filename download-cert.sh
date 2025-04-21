@@ -26,9 +26,10 @@ SECRET_JSON=$(cat <<EOF
     "name": "${SECRET_NAME}",
     "namespace": "${KUBE_NAMESPACE}"
   },
-  "annotations":
+  "annotations": {
     "reflector.v1.k8s.emberstack.com/reflection-allowed": "true",
     "reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces": ""
+  },
   "type": "kubernetes.io/tls",
   "data": {
     "tls.crt": "$(cat "$BACKUPDIR/cert.pem")",
@@ -38,7 +39,6 @@ SECRET_JSON=$(cat <<EOF
 EOF
 )
 
-# unsure if this will work
 curl -v --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
     -H "Authorization: Bearer $KUBE_TOKEN" \
     -H "Content-Type: application/json" \
