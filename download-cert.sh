@@ -12,8 +12,8 @@ KUBE_TOKEN=`cat $token_path`
 KUBE_NAMESPACE=`cat $namespace_path`
 
 
-curl -u $API_KEY:$API_SECRET 'Authorization:Basic $test' $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt' >> "$BACKUPDIR/key.pem"
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv' >> "$BACKUPDIR/cert.pem"
+curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt' >> "$BACKUPDIR/crt.pem"
+curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv' >> "$BACKUPDIR/key.pem"
 curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt' >>  "$BACKUPDIR/cacert.pem" 
 
 cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/cert.pem"
@@ -26,10 +26,13 @@ SECRET_JSON=$(cat <<EOF
     "name": "${SECRET_NAME}",
     "namespace": "${KUBE_NAMESPACE}"
   },
+  "annotations":
+    "reflector.v1.k8s.emberstack.com/reflection-allowed": "true",
+    "reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces": ""
   "type": "kubernetes.io/tls",
   "data": {
-    "tls.crt": "$(cat "$BACKUPDIR/cert.pem" | base64 -w 0)",
-    "tls.key": "$(cat "$BACKUPDIR/key.pem" | base64 -w 0)"
+    "tls.crt": "$(cat "$BACKUPDIR/cert.pem")",
+    "tls.key": "$(cat "$BACKUPDIR/key.pem")"
   }
 }
 EOF
