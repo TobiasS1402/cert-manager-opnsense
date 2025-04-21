@@ -32,7 +32,7 @@ SECRET_JSON=$(cat <<EOF
   },
   "type": "kubernetes.io/tls",
   "data": {
-    "tls.crt": "$(cat "$$BACKUPDIR/crt.pem" | base64 | tr -d '\n')",
+    "tls.crt": "$(cat "$BACKUPDIR/crt.pem" | base64 | tr -d '\n')",
     "tls.key": "$(cat "$BACKUPDIR/key.pem" | base64 | tr -d '\n')"
   }
 }
