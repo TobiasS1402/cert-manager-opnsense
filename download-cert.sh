@@ -8,8 +8,8 @@ BACKUPDIR="/tmp"
 
 OPNSENSE_API="https://${OPNSENSE_HOST}/api/trust"
 
-KUBE_TOKEN=`cat $namespace_path`
-KUBE_NAMESPACE=`cat $token_path`
+KUBE_TOKEN=`cat $token_path`
+KUBE_NAMESPACE=`cat $namespace_path`
 
 
 curl -u $API_KEY:$API_SECRET 'Authorization:Basic $test' $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt' >> "$BACKUPDIR/key.pem"
@@ -36,7 +36,7 @@ EOF
 )
 
 # unsure if this will work
-curl --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$namespace_path/secrets" \
+curl -v --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
     -H "Authorization: Bearer $KUBE_TOKEN" \
     -H "Content-Type: application/json" \
     -d "$SECRET_JSON" \
