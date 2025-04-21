@@ -8,8 +8,8 @@ BACKUPDIR="/tmp"
 
 OPNSENSE_API="https://${OPNSENSE_HOST}/api/trust"
 
-KUBE_TOKEN=`cat namespace_path`
-KUBE_NAMESPACE=`cat token_path`
+KUBE_TOKEN=`cat $namespace_path`
+KUBE_NAMESPACE=`cat $token_path`
 
 
 curl -u $API_KEY:$API_SECRET 'Authorization:Basic $test' $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt' >> "$BACKUPDIR/key.pem"
