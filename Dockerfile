@@ -1,6 +1,6 @@
 FROM alpine:3.21
 
-RUN apk update && apk add jq curl bash
+RUN apk update && apk add jq curl
 
 WORKDIR /certificate
 

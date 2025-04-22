@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 token_path="/var/run/secrets/kubernetes.io/serviceaccount/token"
 ca_cert_path="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
@@ -11,13 +11,15 @@ OPNSENSE_API="https://${OPNSENSE_HOST}/api/trust"
 KUBE_TOKEN=`cat $token_path`
 KUBE_NAMESPACE=`cat $namespace_path`
 
+request_certs(){
+  curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt_payload' >> "$BACKUPDIR/crt.pem"
+  curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv_payload' >> "$BACKUPDIR/key.pem"
+  curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt_payload' >>  "$BACKUPDIR/cacert.pem" 
 
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.crt_payload' >> "$BACKUPDIR/crt.pem"
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/cert/get/$CERT_UUID | jq --raw-output '.cert.prv_payload' >> "$BACKUPDIR/key.pem"
-curl -u $API_KEY:$API_SECRET $OPNSENSE_API/ca/get/$CA_UUID | jq --raw-output '.ca.crt_payload' >>  "$BACKUPDIR/cacert.pem" 
+  cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/crt.pem"
+}
 
-cat "$BACKUPDIR/cacert.pem" >> "$BACKUPDIR/crt.pem"
-
+send_to_k8s(){
 SECRET_JSON=$(cat <<EOF
 {
   "apiVersion": "v1",
@@ -57,3 +59,21 @@ else
         -H "Content-Type: application/json" \
         -d "$SECRET_JSON"
 fi
+}
+
+
+if [[ -v KUBE_TOKEN && -v KUBE_NAMESPACE ]]; then
+  if [[ -v OPNSENSE_HOST && -v API_KEY && -v API_SECRET && -v CERT_UUID && -v CA_UUID && -v SECRET_NAME]]; then
+    request_certs
+    send_to_k8s
+  else
+    echo "Required variables not found, did you assign the rolebinding? exiting."
+    exit 1
+  fi
+else
+  echo "Kubernetes variables not found, did you assign the rolebinding? exiting."
+  exit 1
+fi
+
+
+
