@@ -62,16 +62,16 @@ fi
 }
 
 
-if [[ -v KUBE_TOKEN && -v KUBE_NAMESPACE ]]; then
-  if [[ -v OPNSENSE_HOST && -v API_KEY && -v API_SECRET && -v CERT_UUID && -v CA_UUID && -v SECRET_NAME]]; then
+if [ -n "${KUBE_TOKEN+x}" ] && [ -n "${KUBE_NAMESPACE+x}" ]; then
+  if [ -n "${OPNSENSE_HOST+x}" ] && [ -n "${API_KEY+x}" ] && [ -n "${API_SECRET+x}" ] && [ -n "${CERT_UUID+x}" ] && [ -n "${CA_UUID+x}" ] && [ -n "${SECRET_NAME+x}" ]; then
     request_certs
     send_to_k8s
   else
-    echo "Required variables not found, did you assign the rolebinding? exiting."
+    echo "Required variables not found, did you assign the rolebinding? Exiting."
     exit 1
   fi
 else
-  echo "Kubernetes variables not found, did you assign the rolebinding? exiting."
+  echo "Kubernetes variables not found, did you assign the rolebinding? Exiting."
   exit 1
 fi
 
