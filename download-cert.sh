@@ -37,16 +37,18 @@ SECRET_JSON=$(cat <<EOF
 EOF
 )
 
-SECRET_EXISTS=$(curl -v --insecure GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
+SECRET_EXISTS=$(curl --insecure -X GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
     -H "Authorization: Bearer $KUBE_TOKEN" | jq -r '.kind')
 
-CURRENT_CERT=$(curl -v --insecure GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
+CURRENT_CERT=$(curl --insecure -X GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
     -H "Authorization: Bearer $KUBE_TOKEN" | jq -r '.data.tls.crt')
 
+echo $CURRENT_CERT
+
 if [[ "$SECRET_EXISTS" == "Secret" ]]; then
-    if [[ "$CURRENT_CERT" == "$(cat "$BACKUPDIR/crt.pem" | base64 | tr -d '\n')" ]]; then
+    if [[ "$CURRENT_CERT" != "$(cat "$BACKUPDIR/crt.pem" | base64 | tr -d '\n')" ]]; then
       echo "Secret customcert already exists, patching."
-      curl -v --insecure -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
+      curl --insecure -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
       -H "Authorization: Bearer $KUBE_TOKEN" \
       -H "Content-Type: application/json" \
       -d "$SECRET_JSON"
@@ -56,7 +58,7 @@ if [[ "$SECRET_EXISTS" == "Secret" ]]; then
     fi
 else
     echo "Secret does not exist, creating..."
-    curl -v --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
+    curl --insecure -X POST "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets" \
         -H "Authorization: Bearer $KUBE_TOKEN" \
         -H "Content-Type: application/json" \
         -d "$SECRET_JSON"
