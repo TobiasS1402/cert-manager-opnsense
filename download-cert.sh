@@ -28,10 +28,6 @@ SECRET_JSON=$(cat <<EOF
     "name": "${SECRET_NAME}",
     "namespace": "${KUBE_NAMESPACE}"
   },
-  "annotations": {
-    "reflector.v1.k8s.emberstack.com/reflection-allowed": "true",
-    "reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces": ""
-  },
   "type": "kubernetes.io/tls",
   "data": {
     "tls.crt": "$(cat "$BACKUPDIR/crt.pem" | base64 | tr -d '\n')",
@@ -42,9 +38,9 @@ EOF
 )
 
 SECRET_EXISTS=$(curl -s --insecure -X -v GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/customcert" \
-    -H "Authorization: Bearer $KUBE_TOKEN" | jq -r '.kind')
+    -H "Authorization: Bearer $KUBE_TOKEN")
 
-cat $SECRET_EXISTS
+echo $SECRET_EXISTS
 
 if [[ "$SECRET_EXISTS" == "Secret" ]]; then
     echo "Secret customcert already exists, patching."
