@@ -37,7 +37,7 @@ SECRET_JSON=$(cat <<EOF
 EOF
 )
 
-SECRET_EXISTS=$(curl -s --insecure -X -v GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
+SECRET_EXISTS=$(curl -v --insecure -X GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
     -H "Authorization: Bearer $KUBE_TOKEN")
 
 echo $SECRET_EXISTS
