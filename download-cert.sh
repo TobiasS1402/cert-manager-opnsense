@@ -37,6 +37,16 @@ SECRET_JSON=$(cat <<EOF
 EOF
 )
 
+SECRET_PATCH_JSON=$(cat <<EOF
+{
+  "data": {
+    "tls.crt": "$(cat "$BACKUPDIR/crt.pem" | base64 | tr -d '\n')",
+    "tls.key": "$(cat "$BACKUPDIR/key.pem" | base64 | tr -d '\n')"
+  }
+}
+EOF
+)
+
 SECRET_EXISTS=$(curl --insecure -X GET "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
     -H "Authorization: Bearer $KUBE_TOKEN" | jq -r '.kind')
 
@@ -51,7 +61,7 @@ if [[ "$SECRET_EXISTS" == "Secret" ]]; then
       curl --insecure -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
       -H "Authorization: Bearer $KUBE_TOKEN" \
       -H "Content-Type: application/json" \
-      -d "$SECRET_JSON"
+      -d "$SECRET_PATCH_JSON"
     else
       echo "Nothing to do, certificate still the same."
       exit 0
