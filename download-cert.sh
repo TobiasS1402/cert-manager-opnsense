@@ -60,7 +60,7 @@ if [[ "$SECRET_EXISTS" == "Secret" ]]; then
       echo "Secret customcert already exists, patching."
       curl --insecure -X PATCH "https://kubernetes.default.svc/api/v1/namespaces/$KUBE_NAMESPACE/secrets/$SECRET_NAME" \
       -H "Authorization: Bearer $KUBE_TOKEN" \
-      -H "Content-Type: application/json" \
+      -H "Content-Type": "application/strategic-merge-patch+json" \
       -d "$SECRET_PATCH_JSON"
     else
       echo "Nothing to do, certificate still the same."
